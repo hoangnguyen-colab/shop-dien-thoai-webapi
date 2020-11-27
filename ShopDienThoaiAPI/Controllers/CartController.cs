@@ -5,6 +5,9 @@ using ShopDienThoaiAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -40,91 +43,160 @@ namespace ShopDienThoaiAPI.Controllers
         [HttpPost]
         public async Task<JsonResult> SubmitCheckoutCustomer(CheckoutModel model)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var customer = await new CustomerDAO().LoadByUsername(HttpContext.User.Identity.Name);
-                var order = await new OrderDAO().AddOrderCustomer(customer.CustomerID, model.CustomerName, model.CustomerAddress, model.CustomerPhone, await GetTotal());
-                if (order != 0)
+                var customer = await GlobalVariable.GetCustomer(HttpContext.User.Identity.Name);
+                if (customer == null)
                 {
-                    try
+                    return Json(new JsonStatus()
                     {
-                        var orderdetail = new OrderDetailDAO();
-                        foreach (var item in (List<CartItemModel>)Session["cart"])
+                        Status = false,
+                        Message = "Can not get your info, try to log in again",
+                        StatusCode = -1
+                    }, JsonRequestBehavior.AllowGet);
+
+                }
+                var order = new ORDER
+                {
+                    CustomerID = customer.CustomerID,
+                    CustomerName = customer.CustomerName,
+                    CustomerAddress = model.CustomerAddress,
+                    CustomerPhone = model.CustomerPhone,
+                    OrderStatusID = 1,
+                    Total = await GetTotal(),
+                    OrderDate = DateTime.Now
+                };
+                var json = JsonConvert.SerializeObject(order);
+                var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+                string url = GlobalVariable.url + "api/order/create";
+
+                try
+                {
+                    var client = new HttpClient();
+                    //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AdminController.AdminToken);
+                    client.BaseAddress = new Uri(url);
+
+                    var response = await client.PostAsync(url, data);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var orderid = await response.Content.ReadAsStringAsync();
+                        var result = AddOrderDetail(Convert.ToInt32(orderid));
+                        return Json(new JsonStatus()
                         {
-                            await orderdetail.AddOrderDetail(order, item.product.ProductID, item.quantity);
-                        }
-                        Session["cart"] = null;
-                        return Json(new { Success = true, ID = order }, JsonRequestBehavior.AllowGet);
+                            Status = true,
+                            Message = "Create Success",
+                            StatusCode = (int)response.StatusCode
+                        }, JsonRequestBehavior.AllowGet);
                     }
-                    catch
+                    else
                     {
-                        var result = await new OrderDAO().DeleteOrder(order);
-                        return Json(new { Success = false, error = "error creating order details" }, JsonRequestBehavior.AllowGet);
+                        return Json(new JsonStatus()
+                        {
+                            Status = false,
+                            Message = await response.Content.ReadAsStringAsync(),
+                            StatusCode = (int)response.StatusCode
+                        }, JsonRequestBehavior.AllowGet);
                     }
                 }
-                return Json(new { Success = false }, JsonRequestBehavior.AllowGet);
+                catch
+                {
+                    return Json(new JsonStatus()
+                    {
+                        Status = false,
+                        Message = "Error while creating your order",
+                        StatusCode = 0
+                    }, JsonRequestBehavior.AllowGet);
+                }
             }
-            catch
+            else
             {
-                return Json(new { Success = false }, JsonRequestBehavior.AllowGet);
+                return Json(new JsonStatus()
+                {
+                    Status = false,
+                    Message = "Invalid input"
+                }, JsonRequestBehavior.AllowGet);
             }
         }
 
         [HttpPost]
         public async Task<JsonResult> SubmitCheckout(CheckoutModel model)
         {
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                var order = new ORDER
                 {
-                    var orderid = await new OrderDAO().AddOrder(model.CustomerName, model.CustomerAddress, model.CustomerPhone, await GetTotal());
-                    if (orderid != 0)
+                    CustomerName = model.CustomerName,
+                    CustomerAddress = model.CustomerAddress,
+                    CustomerPhone = model.CustomerPhone,
+                    OrderStatusID = 1,
+                    Total = await GetTotal(),
+                    OrderDate = DateTime.Now
+                };
+                var json = JsonConvert.SerializeObject(order);
+                var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+                string url = GlobalVariable.url + "api/order/creat";
+
+                try
+                {
+                    var client = new HttpClient();
+                    //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AdminController.AdminToken);
+                    client.BaseAddress = new Uri(url);
+
+                    var response = await client.PostAsync(url, data);
+                    if (response.IsSuccessStatusCode)
                     {
-                        try
-                        {
-                            var orderdetail = new OrderDetailDAO();
-                            foreach (var item in (List<CartItemModel>)Session["cart"])
-                            {
-                                await orderdetail.AddOrderDetail(orderid, item.product.ProductID, item.quantity);
-                            }
-                            Session["cart"] = null;
-                            return Json(new JsonStatus()
-                            {
-                                Status = true,
-                                Message = orderid.ToString()
-                            }, JsonRequestBehavior.AllowGet);
-                            //return Json(new { Success = true, ID = orderid }, JsonRequestBehavior.AllowGet);
-                        }
-                        catch
-                        {
-                            var result = await new OrderDAO().DeleteOrder(orderid);
-                            return Json(new JsonStatus()
-                            {
-                                Status = false,
-                                Message = "error creating order details"
-                            }, JsonRequestBehavior.AllowGet);
-                            //return Json(new { Success = false, error = "error creating order details" }, JsonRequestBehavior.AllowGet);
-                        }
+                        //return Json(new JsonStatus()
+                        //{
+                        //    Status = true,
+                        //    Message = "Create Success",
+                        //    StatusCode = (int)response.StatusCode
+                        //}, JsonRequestBehavior.AllowGet);
                     }
+                    else
+                    {
+                        return Json(new JsonStatus()
+                        {
+                            Status = false,
+                            Message = response.ReasonPhrase,
+                            StatusCode = (int)response.StatusCode
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                }
+                catch
+                {
                     return Json(new JsonStatus()
                     {
                         Status = false,
-                        Message = "Fail create order"
+                        Message = "Error while creating your order",
+                        StatusCode = 0
                     }, JsonRequestBehavior.AllowGet);
                 }
-                return Json(new JsonStatus()
+            }
+            return Json(new JsonStatus()
+            {
+                Status = false,
+                Message = "Invalid input"
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        private async Task<bool> AddOrderDetail(int orderid)
+        {
+            try
+            {
+                var orderdetail = new OrderDetailDAO();
+                foreach (var item in (List<CartItemModel>)Session["cart"])
                 {
-                    Status = false,
-                    Message = "Model State no valid"
-                }, JsonRequestBehavior.AllowGet);
+                    await orderdetail.AddOrderDetail(orderid, item.product.ProductID, item.quantity);
+                }
+                Session["cart"] = null;
+                return true;
             }
             catch
             {
-                return Json(new JsonStatus()
-                {
-                    Status = false,
-                    Message = "Error"
-                }, JsonRequestBehavior.AllowGet);
+                var result = await new OrderDAO().DeleteOrder(orderid);
+                return false;
             }
         }
 

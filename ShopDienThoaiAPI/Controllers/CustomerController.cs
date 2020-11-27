@@ -154,23 +154,12 @@ namespace ShopDienThoaiAPI.Controllers
         [Route("profile")]
         public async Task<ActionResult> CustomerProfile()
         {
-            var membername = HttpContext.User.Identity.Name;
-
-            string apiurl = GlobalVariable.url + "api/customer/loadbyusername?username=" + membername;
-            using (var client = new HttpClient())
+            var customer = await GlobalVariable.GetCustomer(HttpContext.User.Identity.Name);
+            if (customer == null)
             {
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CustomerController.CustomerToken);
-                var response = await client.GetStringAsync(apiurl);
-                try
-                {
-                    var customer = JsonConvert.DeserializeObject<CUSTOMER>(response);
-                    return View(customer);
-                }
-                catch
-                {
-                    return HttpNotFound();
-                }
+                return HttpNotFound();
             }
+            return View(customer);
             //return View(await new CustomerDAO().LoadByUsername(membername));
         }
     }

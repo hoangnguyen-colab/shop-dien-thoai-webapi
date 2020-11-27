@@ -13,7 +13,7 @@ namespace ShopDienThoaiAPI.Controllers.Api
     //[Authorize]
     public class OrderController : ApiController
     {
-        [Authorize]
+        //[Authorize]
         [Route("api/order/getorder")]
         public async Task<IEnumerable<ORDER>> GetOrder(int customerid)
         {
@@ -21,7 +21,7 @@ namespace ShopDienThoaiAPI.Controllers.Api
             return item;
         }
 
-        [Authorize]
+        //[Authorize]
         [Route("api/order/getorderlist")]
         public async Task<IEnumerable<ORDER>> GetOrderList(int customerid)
         {
@@ -29,14 +29,14 @@ namespace ShopDienThoaiAPI.Controllers.Api
             return list;
         }
 
-        [Authorize]
+        //[Authorize]
         [Route("api/order/getproductlist")]
         public async Task<IQueryable<Object>> GetProductList(int orderid)
         {
             return await new OrderDAO().LoadProductOrder(orderid);
         }
 
-        [Authorize]
+        //[Authorize]
         [Route("api/order/getorderstatus")]
         public async Task<ORDERSTATU> GetOrderName(int orderid)
         {
@@ -45,15 +45,45 @@ namespace ShopDienThoaiAPI.Controllers.Api
             return statusname;
         }
 
-        [Authorize]
-        [Route("api/order/cancelorder")]
-        public async Task<IHttpActionResult> CancelOrder(ORDER order)
+        //[Authorize]
+        [Route("api/order/cancel")]
+        [HttpPut]
+        public async Task<IHttpActionResult> CancelOrder(int orderid)
         {
-            var result = await new OrderDAO().ChangeOrder(order.OrderID, 5);
-            if (result == 0)
-                return BadRequest("Not available");
-            else
-                return Ok();
+            try
+            {
+                var result = await new OrderDAO().ChangeOrder(orderid, 5);
+                if (result == 0)
+                    return Content(HttpStatusCode.BadRequest, "Fail");
+                else if (result == -1)
+                    return Content(HttpStatusCode.BadRequest, "Error orcured");
+                else
+                    return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.BadRequest, ex.Message);
+            }
+        }
+
+        [Route("api/order/create")]
+        [HttpPost]
+        public async Task<IHttpActionResult> CreateOrder(ORDER order)
+        {
+            try
+            {
+                var result = await new OrderDAO().CreateOrder(order);
+                if (result > 0)
+                    return Ok(result);
+                else
+                    return Content(HttpStatusCode.BadRequest, "Fail");
+
+            }
+            catch (Exception ex)
+            {
+                return Content(HttpStatusCode.BadRequest, ex.Message);
+            }
+
         }
     }
 }

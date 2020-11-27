@@ -17,37 +17,18 @@ namespace Models.DAO
             db = new ShopDienThoaiAPI();
         }
 
-        public async Task<int> AddOrderCustomer(int CustomerID, string name, string address, string phone, decimal total)
+        public async Task<int> CreateOrder(ORDER order)
         {
-            var order = new ORDER
+            try
             {
-                CustomerID = CustomerID,
-                CustomerName = name,
-                CustomerAddress = address,
-                CustomerPhone = phone,
-                OrderStatusID = 1,
-                Total = total,
-                OrderDate = DateTime.Now
-            };
-            db.ORDERs.Add(order);
-            await db.SaveChangesAsync();
-            return order.OrderID;
-        }
-
-        public async Task<int> AddOrder(string name, string address, string phone, decimal total)
-        {
-            var order = new ORDER
+                db.ORDERs.Add(order);
+                await db.SaveChangesAsync();
+                return order.OrderID;
+            }
+            catch (Exception ex)
             {
-                CustomerName = name,
-                CustomerAddress = address,
-                CustomerPhone = phone,
-                Total = total,
-                OrderStatusID = 1,
-                OrderDate = DateTime.Now
-            };
-            db.ORDERs.Add(order);
-            await db.SaveChangesAsync();
-            return order.OrderID;
+                return 0;
+            }
         }
 
         public async Task<ORDER> LoadByID(int OrderID)
@@ -106,7 +87,7 @@ namespace Models.DAO
             }
             catch
             {
-                return 0;
+                return -1;
             }
         }
 

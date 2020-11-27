@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Models.EF;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http.Results;
@@ -24,6 +27,21 @@ namespace ShopDienThoaiAPI.Controllers
                 {
                     return Response.ReasonPhrase;
                 }
+            }
+        }
+        public static async Task<CUSTOMER> GetCustomer(string name)
+        {
+            string apiurl = url + "api/customer/loadbyusername?username=" + name;
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CustomerController.CustomerToken);
+            var response = await client.GetStringAsync(apiurl);
+            try
+            {
+                return JsonConvert.DeserializeObject<CUSTOMER>(response);
+            }
+            catch
+            {
+                return null;
             }
         }
     }

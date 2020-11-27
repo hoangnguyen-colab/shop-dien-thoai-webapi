@@ -1,4 +1,4 @@
-﻿@model IEnumerable<cong_nghe_web.Models.CartItemModel>
+﻿@model IEnumerable<ShopDienThoaiAPI.Models.CartItemModel>
 @{
     ViewBag.Title = "Checkout";
     var customer = ViewData["Customer"] as Models.EF.CUSTOMER;
@@ -218,7 +218,8 @@
                         dataType: "json",
                         contentType: "application/json",
                         success: function (response) {
-                            if (response.Success) {
+                            console.log(response);
+                            @*if (response.Success) {
                                 $('#checkout-btn').val("Đặt hàng thành công").css("background", "#00ff7f").css("color", "#000");
 
                                 $("#timer-text").text("Trở về trang cá nhân sau: ");
@@ -234,7 +235,7 @@
 
                             } else {
                                 $('#checkout-btn').val("Đặt hàng thất bại").css("background", "#f51d1a");
-                            }
+                            }*@
                         },
                         error: function () {
                             $('#checkout-btn').val("Đã có lỗi khi đặt hàng").css("background", "#f51d1a");

@@ -53,7 +53,7 @@ namespace ShopDienThoaiAPI.Areas.Admin.Controllers
                     return Json(new JsonStatus()
                     {
                         Status = false,
-                        Message = response.ReasonPhrase,
+                        Message = await response.Content.ReadAsStringAsync(),
                         StatusCode = (int)response.StatusCode
                     }, JsonRequestBehavior.AllowGet);
                 }
@@ -98,7 +98,7 @@ namespace ShopDienThoaiAPI.Areas.Admin.Controllers
                     return Json(new JsonStatus()
                     {
                         Status = false,
-                        Message = response.ReasonPhrase,
+                        Message = await response.Content.ReadAsStringAsync(),
                         StatusCode = (int)response.StatusCode
                     }, JsonRequestBehavior.AllowGet);
                 }
@@ -140,7 +140,7 @@ namespace ShopDienThoaiAPI.Areas.Admin.Controllers
                     return Json(new JsonStatus()
                     {
                         Status = false,
-                        Message = response.ReasonPhrase,
+                        Message = await response.Content.ReadAsStringAsync(),
                         StatusCode = (int)response.StatusCode
                     }, JsonRequestBehavior.AllowGet);
                 }
