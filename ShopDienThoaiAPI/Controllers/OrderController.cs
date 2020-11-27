@@ -23,7 +23,7 @@ namespace ShopDienThoaiAPI.Controllers
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri(GlobalVariable.url + "api/order/cancelorder");
+                client.BaseAddress = new Uri(GlobalVariable.url + "api/order/cancel");
 
                 //HTTP POST
                 var response = await client.PutAsJsonAsync("order", new ORDER()
@@ -34,12 +34,20 @@ namespace ShopDienThoaiAPI.Controllers
                 if (response.IsSuccessStatusCode)
                 {
 
-                    return Json(new { Success = true }, JsonRequestBehavior.AllowGet);
+                    return Json(new JsonStatus()
+                    {
+                        Status = true,
+                        Message = "Order canceled"
+                    }, JsonRequestBehavior.AllowGet);
 
                 }
                 else
                 {
-                    return Json(new { Success = false, Msg = response.ReasonPhrase }, JsonRequestBehavior.AllowGet);
+                    return Json(new JsonStatus()
+                    {
+                        Status = true,
+                        Message = await response.Content.ReadAsStringAsync()
+                    }, JsonRequestBehavior.AllowGet);
 
                 }
             }

@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using ShopDienThoaiAPI.Models;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -136,7 +137,7 @@ namespace ShopDienThoaiAPI.Controllers
                 var json = JsonConvert.SerializeObject(order);
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-                string url = GlobalVariable.url + "api/order/creat";
+                string url = GlobalVariable.url + "api/order/create";
 
                 try
                 {
@@ -147,19 +148,21 @@ namespace ShopDienThoaiAPI.Controllers
                     var response = await client.PostAsync(url, data);
                     if (response.IsSuccessStatusCode)
                     {
-                        //return Json(new JsonStatus()
-                        //{
-                        //    Status = true,
-                        //    Message = "Create Success",
-                        //    StatusCode = (int)response.StatusCode
-                        //}, JsonRequestBehavior.AllowGet);
+                        var orderid = await response.Content.ReadAsStringAsync();
+                        var result = AddOrderDetail(Convert.ToInt32(orderid));
+                        return Json(new JsonStatus()
+                        {
+                            Status = true,
+                            Message = "Create Success",
+                            StatusCode = (int)response.StatusCode
+                        }, JsonRequestBehavior.AllowGet);
                     }
                     else
                     {
                         return Json(new JsonStatus()
                         {
                             Status = false,
-                            Message = response.ReasonPhrase,
+                            Message = await response.Content.ReadAsStringAsync(),
                             StatusCode = (int)response.StatusCode
                         }, JsonRequestBehavior.AllowGet);
                     }
@@ -174,29 +177,61 @@ namespace ShopDienThoaiAPI.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
             }
-            return Json(new JsonStatus()
+            else
             {
-                Status = false,
-                Message = "Invalid input"
-            }, JsonRequestBehavior.AllowGet);
+                return Json(new JsonStatus()
+                {
+                    Status = false,
+                    Message = "Invalid input"
+                }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         private async Task<bool> AddOrderDetail(int orderid)
         {
             try
             {
-                var orderdetail = new OrderDetailDAO();
-                foreach (var item in (List<CartItemModel>)Session["cart"])
+                string url = GlobalVariable.url + "api/orderdetail/create?orderid=" + orderid;
+
+                var client = new HttpClient();
+                //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AdminController.AdminToken);
+                client.BaseAddress = new Uri(url);
+
+                var list = (List<CartItemModel>)Session["cart"];
+                var json = JsonConvert.SerializeObject(list);
+                var data = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync(url, data);
+                if (response.IsSuccessStatusCode)
                 {
-                    await orderdetail.AddOrderDetail(orderid, item.product.ProductID, item.quantity);
+                    var detailid = await response.Content.ReadAsStringAsync();
+                    var result = AddOrderDetail(Convert.ToInt32(orderid));
+                    Session["cart"] = null;
+                    return true;
+                } else
+                {
+                    return false;
                 }
-                Session["cart"] = null;
-                return true;
+                
             }
             catch
             {
-                var result = await new OrderDAO().DeleteOrder(orderid);
-                return false;
+                string url = GlobalVariable.url + "api/order/delete?id=" + orderid;
+
+                try
+                {
+                    var client = new HttpClient();
+                    //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AdminController.AdminToken);
+                    client.BaseAddress = new Uri(url);
+
+                    var response = await client.DeleteAsync(url);
+
+                    return false;
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
 

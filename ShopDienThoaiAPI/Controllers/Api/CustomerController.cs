@@ -9,7 +9,7 @@ namespace ShopDienThoaiAPI.Controllers.Api
 {
     public class CustomerController : ApiController
     {
-        [Authorize(Roles = "customer")]
+        [Authorize]
         [HttpGet]
         [Route("api/customer/loadbyusername")]
         public async Task<CUSTOMER> LoadCustomer(string username)

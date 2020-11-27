@@ -11,11 +11,13 @@ namespace ShopDienThoaiAPI.Controllers.Api
 {
     public class BrandController : ApiController
     {
+        [HttpGet]
         public async Task<IEnumerable<BRAND>> GetBrand()
         {
             return await new BrandDAO().LoadData();
         }
 
+        [HttpGet]
         [Route("api/brand/getbrand")]
         public async Task<BRAND> GetBrand(int brandid)
         {

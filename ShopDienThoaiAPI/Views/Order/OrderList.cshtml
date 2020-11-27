@@ -118,7 +118,6 @@
                     "orderid": "@item.OrderID"
                 },
                 function (data) {
-                    console.log(data);
                     for (i = 0; i < data.length; i++) {
                         $("#@item.OrderID-product-table > table > tbody").append(`<tr>
                             <td class="text-center">${data[i].productid}</td>
