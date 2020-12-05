@@ -1,7 +1,7 @@
 ﻿using Models.DAO;
 using Models.EF;
 using Newtonsoft.Json;
-using ShopDienThoaiAPI.Controllers;
+using ShopDienThoaiAPI.Common;
 using ShopDienThoaiAPI.Models;
 using System;
 using System.Collections.Generic;

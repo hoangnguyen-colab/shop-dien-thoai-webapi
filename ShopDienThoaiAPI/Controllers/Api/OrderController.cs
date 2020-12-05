@@ -15,6 +15,19 @@ namespace ShopDienThoaiAPI.Controllers.Api
     public class OrderController : ApiController
     {
         //[Authorize]
+        [Route("api/order/getorderstatus")]
+        public async Task<IEnumerable<ORDERSTATU>> GetOrderStatus()
+        {
+            return await new OrderStatusDAO().LoadStatus();
+        }
+        //[Authorize]
+        [Route("api/order/getall")]
+        public async Task<IEnumerable<ORDER>> GetAllOrder()
+        {
+            return await new OrderDAO().LoadOrder();
+        }
+
+        //[Authorize]
         [Route("api/order/getorder")]
         public async Task<IEnumerable<ORDER>> GetOrder(int customerid)
         {
@@ -47,13 +60,13 @@ namespace ShopDienThoaiAPI.Controllers.Api
         }
 
         //[Authorize]
-        [Route("api/order/cancel")]
+        [Route("api/order/updatestatus")]
         [HttpPut]
-        public async Task<IHttpActionResult> CancelOrder(int orderid)
+        public async Task<IHttpActionResult> UpdateOrderStatus(int orderid, ORDERSTATU status)
         {
             try
             {
-                var result = await new OrderDAO().ChangeOrder(orderid, 5);
+                var result = await new OrderDAO().ChangeOrder(orderid, status.StatusID);
                 if (result == 0)
                     return Content(HttpStatusCode.BadRequest, "Fail");
                 else if (result == -1)

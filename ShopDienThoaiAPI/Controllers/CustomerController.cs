@@ -17,6 +17,7 @@ using System.Web.Script.Serialization;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using ShopDienThoaiAPI.Common;
 
 namespace ShopDienThoaiAPI.Controllers
 {
@@ -141,7 +142,7 @@ namespace ShopDienThoaiAPI.Controllers
             }
         }
 
-        [Authorize]
+        [System.Web.Http.Authorize]
         [ActionName("Logout")]
         public ActionResult Logout()
         {
@@ -150,11 +151,11 @@ namespace ShopDienThoaiAPI.Controllers
             return RedirectToAction("Login", "Customer");
         }
 
-        [Authorize]
+        [System.Web.Http.Authorize]
         [Route("profile")]
         public async Task<ActionResult> CustomerProfile()
         {
-            var customer = await GlobalVariable.GetCustomer(HttpContext.User.Identity.Name);
+            var customer = await GlobalVariable.GetCustomer(HttpContext.User.Identity.Name, CustomerToken);
             if (customer == null)
             {
                 return HttpNotFound();

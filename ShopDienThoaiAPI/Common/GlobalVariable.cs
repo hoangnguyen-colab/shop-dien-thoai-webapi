@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http.Results;
 
-namespace ShopDienThoaiAPI.Controllers
+namespace ShopDienThoaiAPI.Common
 {
     public class GlobalVariable
     {
@@ -29,11 +29,11 @@ namespace ShopDienThoaiAPI.Controllers
                 }
             }
         }
-        public static async Task<CUSTOMER> GetCustomer(string name)
+        public static async Task<CUSTOMER> GetCustomer(string name, string token)
         {
             string apiurl = url + "api/customer/loadbyusername?username=" + name;
             var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", CustomerController.CustomerToken);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             var response = await client.GetStringAsync(apiurl);
             try
             {

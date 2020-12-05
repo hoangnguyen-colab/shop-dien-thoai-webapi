@@ -11,6 +11,8 @@ using System.Net.Http.Headers;
 using System.Net;
 using Newtonsoft.Json;
 using Models.EF;
+using ShopDienThoaiAPI.Common;
+using System.Text;
 
 namespace ShopDienThoaiAPI.Controllers
 {
@@ -18,42 +20,55 @@ namespace ShopDienThoaiAPI.Controllers
     public class OrderController : Controller
     {
         [HttpPost]
-        [Authorize]
+        [System.Web.Http.Authorize]
         public async Task<JsonResult> CancelOrder(int OrderID)
         {
-            using (var client = new HttpClient())
+            var json = JsonConvert.SerializeObject(new ORDERSTATU()
             {
-                client.BaseAddress = new Uri(GlobalVariable.url + "api/order/cancel");
+                StatusID = 5
+            });
+            var data = new StringContent(json, Encoding.UTF8, "application/json");
 
-                //HTTP POST
-                var response = await client.PutAsJsonAsync("order", new ORDER()
-                {
-                    OrderID = OrderID
-                });
+            string url = GlobalVariable.url + "api/order/updatestatus?orderid=" + OrderID;
 
+            try
+            {
+                var client = new HttpClient();
+                //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AdminController.AdminToken);
+                client.BaseAddress = new Uri(url);
+
+                var response = await client.PutAsync(url, data);
                 if (response.IsSuccessStatusCode)
                 {
-
                     return Json(new JsonStatus()
                     {
                         Status = true,
-                        Message = "Order canceled"
+                        Message = "Update Success",
+                        StatusCode = (int)response.StatusCode
                     }, JsonRequestBehavior.AllowGet);
-
                 }
                 else
                 {
                     return Json(new JsonStatus()
                     {
-                        Status = true,
-                        Message = await response.Content.ReadAsStringAsync()
+                        Status = false,
+                        Message = await response.Content.ReadAsStringAsync(),
+                        StatusCode = (int)response.StatusCode
                     }, JsonRequestBehavior.AllowGet);
-
                 }
+            }
+            catch
+            {
+                return Json(new JsonStatus()
+                {
+                    Status = false,
+                    Message = "Error while updating brand",
+                    StatusCode = 0
+                }, JsonRequestBehavior.AllowGet);
             }
         }
 
-        [Authorize]
+        [System.Web.Http.Authorize]
         public async Task<ActionResult> OrderList(int? StatusID)
         {
             var membername = HttpContext.User.Identity.Name;

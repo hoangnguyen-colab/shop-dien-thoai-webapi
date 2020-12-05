@@ -1,6 +1,7 @@
 ﻿using Models.DAO;
 using Models.EF;
 using Newtonsoft.Json;
+using ShopDienThoaiAPI.Common;
 using ShopDienThoaiAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -40,13 +41,13 @@ namespace ShopDienThoaiAPI.Controllers
             return View("CheckoutCustomer", (List<CartItemModel>)Session["cart"]);
         }
 
-        [Authorize]
+        [System.Web.Http.Authorize]
         [HttpPost]
         public async Task<JsonResult> SubmitCheckoutCustomer(CheckoutModel model)
         {
             if (ModelState.IsValid)
             {
-                var customer = await GlobalVariable.GetCustomer(HttpContext.User.Identity.Name);
+                var customer = await GlobalVariable.GetCustomer(HttpContext.User.Identity.Name, CustomerController.CustomerToken);
                 if (customer == null)
                 {
                     return Json(new JsonStatus()

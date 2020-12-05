@@ -214,14 +214,17 @@
                     url: `@Url.Action("CancelOrder", "Order")`,
                     data: "OrderID=" + id,
                     success: function (response) {
-                        if (response.Success) {
-                            window.location.reload();
-                        } else {
-                            console.log("error");
+                        if (response.Status == true) {
+                            swal("Cancel success", "", "success")
+                                .then((value) => {
+                                    location.reload();
+                                });
+                        } else if (response.Status == false) {
+                            swal("Cancel fail", data.Message, "error");
                         }
                     },
                     error: function () {
-                        console.log("error");
+                        swal("Cancel fail", "", "error");
                     }
                 });
             }

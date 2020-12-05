@@ -4,28 +4,75 @@
 }
 
 <link href="~/Assets/loading-spinner.css" rel="stylesheet" />
+<link href="~/Areas/Admin/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="~/Areas/Admin/assets/plugins/datatables/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+<link href="~/Areas/Admin/assets/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
 <h2>OrderList</h2>
 
 <div class="row">
-    <div class="col-sm" id="order-partial">
+    <div class="col-sm">
         <div class="loader" id="loader">
             <svg class="circular">
                 <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="5" stroke-miterlimit="10"></circle>
             </svg>
         </div>
+        <table class="table table-bordered" id="order-table">
+            <thead>
+                <tr>
+                    <th>
+                        ID
+                    </th>
+                    <th>
+                        Tên KH
+                    </th>
+                    <th>
+                        ID KH
+                    </th>
+                    <th>
+                        Địa chỉ
+                    </th>
+                    <th>
+                        Sđt
+                    </th>
+                    <th>
+                        Trạng thái
+                    </th>
+                    <th>
+                        Ngày đặt
+                    </th>
+                    <th>
+                        Tổng
+                    </th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody id="order-partial">
+            </tbody>
+        </table>
     </div>
 </div>
 
 @section scripts{
     <script src="~/Areas/Admin/assets/js/sweetalert.min.js"></script>
+    <script src="~/Areas/Admin/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/Areas/Admin/assets/plugins/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Areas/Admin/assets/plugins/datatables/dataTables.responsive.min.js"></script>
+    <script src="~/Areas/Admin/assets/plugins/datatables/responsive.bootstrap4.min.js"></script>
     <script>
         $(document).ready(function () {
+
             $.get("@Url.Action("OrderList", "Ordered")", function (data) {
                 $("#order-partial").append(data);
                 $("#loader").hide();
-            })
 
+            }).fail(function () {
+                $("#loader").hide();
+                swal("Fail", "Fail to load data", "error");
+
+            }).done(function () {
+                $('#order-table').DataTable();
+            });
         });
 
         function ChangeOrder(id, status) {
@@ -53,11 +100,13 @@
                                 "StatusID": $(`#orderstatus-${id}`).val()
                             },
                             success: function (response) {
-                                if (response.Success == 1) {
-                                    swal("Edited!", "", "success");
-                                    window.location.reload();
+                                if (response.Status) {
+                                    swal("Edit success", "", "success")
+                                        .then((value) => {
+                                            location.reload();
+                                        });
                                 } else {
-                                    swal("Edit fail!", "", "error");
+                                    swal("Edit fail!", `${response.Message}`, "error");
                                 }
                             },
                             error: function (error) {
