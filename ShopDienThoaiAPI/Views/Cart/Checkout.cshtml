@@ -163,7 +163,7 @@
                                     <h5 class="text-center text-danger" id="checkout-info-text"></h5>
                                     <div class="order-button-payment">
 
-                                        <input type="submit" value="Thanh toán" />
+                                        <input type="submit" value="Thanh toán" id="checkout-btn"/>
 
                                     </div>
                                     <div class="row">
@@ -240,32 +240,40 @@
                         "CustomerPhone": $("#customer-phone").val(),
                         "CustomerAddress": $("#customer-address").val()
                     };
+                    $("#checkout-btn").attr("disabled", true);
                     $.ajax({
                         type: "POST",
                         url: "@Url.Action("SubmitCheckout", "Cart")",
                         data: JSON.stringify(data),
                         dataType: "json",
                         contentType: "application/json",
-                        success: function (response) {
-                            if (response.Success) {
-                                $('#checkout-btn').val("Đặt hàng thành công").css("background", "#00ff7f").css("color", "#000");
-                                    
-                                $("#timer-text").text("Trở về trang chủ sau: ");
+                        success: function (data) {
+                            console.log(data);
+                            if (data.Status) {
+                                swal("Success", `${data.Message}`, "success").then(function () {
+                                    location.href = "@Url.Action("Index", "Home")";
+                                });
+                                @*$('#checkout-btn').val("Đặt hàng thành công").css("background", "#00ff7f").css("color", "#000");
+
+                                $("#timer-text").text("Trở về trang cá nhân sau: ");
                                 $("#timer").text("5")
                                 window.setInterval(function () {
                                     var timeLeft = $("#timer").html();
                                     if (eval(timeLeft) == 0) {
-                                        location.href = "@Url.Action("Index", "Home")";
+                                        location.href = "@Url.Action("CustomerProfile", "Customer", new { username = customer.CustomerUsername })";
                                     } else {
                                         $("#timer").html(eval(timeLeft) - eval(1));
                                     }
-                                }, 1000);
+                                }, 1000);*@
+
                             } else {
-                                $('#checkout-btn').val("Đặt hàng thất bại").css("background", "#f51d1a");
+                                swal("Fail", `${data.Message}`, "error");
+                                $("#checkout-btn").attr("disabled", false);
                             }
                         },
                         error: function () {
-                            $('#checkout-btn').val("Đã có lỗi khi đặt hàng").css("background", "#f51d1a");
+                            swal("Fail", `${data.Message}`, "success");
+                            $("#checkout-btn").attr("disabled", false);
                         }
                     });
                 }

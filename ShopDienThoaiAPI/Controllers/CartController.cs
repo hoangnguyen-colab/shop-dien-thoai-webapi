@@ -83,7 +83,7 @@ namespace ShopDienThoaiAPI.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var orderid = await response.Content.ReadAsStringAsync();
-                        var result = AddOrderDetail(Convert.ToInt32(orderid));
+                        var result = AddOrderDetail(Convert.ToInt32(orderid)); Session["cart"] = null;
                         return Json(new JsonStatus()
                         {
                             Status = true,
@@ -150,7 +150,7 @@ namespace ShopDienThoaiAPI.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var orderid = await response.Content.ReadAsStringAsync();
-                        var result = AddOrderDetail(Convert.ToInt32(orderid));
+                        var result = AddOrderDetail(Convert.ToInt32(orderid)); Session["cart"] = null;
                         return Json(new JsonStatus()
                         {
                             Status = true,
@@ -206,14 +206,11 @@ namespace ShopDienThoaiAPI.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var detailid = await response.Content.ReadAsStringAsync();
-                    var result = AddOrderDetail(Convert.ToInt32(orderid));
-                    Session["cart"] = null;
                     return true;
                 } else
                 {
                     return false;
                 }
-                
             }
             catch
             {

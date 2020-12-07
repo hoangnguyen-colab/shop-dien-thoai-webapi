@@ -119,42 +119,42 @@
                         <div class="payment-method mt-40">
                             <div class="payment-accordion">
                                 @*<div class="panel-group" id="faq">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h5 class="panel-title"><a data-toggle="collapse" aria-expanded="true" data-parent="#faq" href="#payment-1">Direct Bank Transfer.</a></h5>
-                </div>
-                <div id="payment-1" class="panel-collapse collapse show">
-                    <div class="panel-body">
-                        <p>Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h5 class="panel-title"><a class="collapsed" data-toggle="collapse" aria-expanded="false" data-parent="#faq" href="#payment-2">Cheque Payment</a></h5>
-                </div>
-                <div id="payment-2" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <p>Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h5 class="panel-title"><a class="collapsed" data-toggle="collapse" aria-expanded="false" data-parent="#faq" href="#payment-3">PayPal</a></h5>
-                </div>
-                <div id="payment-3" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <p>Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
-                    </div>
-                </div>
-            </div>
-        </div>*@
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h5 class="panel-title"><a data-toggle="collapse" aria-expanded="true" data-parent="#faq" href="#payment-1">Direct Bank Transfer.</a></h5>
+                                            </div>
+                                            <div id="payment-1" class="panel-collapse collapse show">
+                                                <div class="panel-body">
+                                                    <p>Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h5 class="panel-title"><a class="collapsed" data-toggle="collapse" aria-expanded="false" data-parent="#faq" href="#payment-2">Cheque Payment</a></h5>
+                                            </div>
+                                            <div id="payment-2" class="panel-collapse collapse">
+                                                <div class="panel-body">
+                                                    <p>Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h5 class="panel-title"><a class="collapsed" data-toggle="collapse" aria-expanded="false" data-parent="#faq" href="#payment-3">PayPal</a></h5>
+                                            </div>
+                                            <div id="payment-3" class="panel-collapse collapse">
+                                                <div class="panel-body">
+                                                    <p>Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order won’t be shipped until the funds have cleared in our account.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>*@
                                 @if (tongsp > 100)
                                 {
-                                    <div >
+                                    <div>
 
-                                        <input border="" type="text" value="Giỏ hàng chứa tối đa 100 sản phẩm, không thể thanh toán" disabled/>
+                                        <input border="" type="text" value="Giỏ hàng chứa tối đa 100 sản phẩm, không thể thanh toán" disabled />
 
                                     </div>
                                 }
@@ -163,7 +163,7 @@
                                     <h5 class="text-center text-danger" id="checkout-info-text"></h5>
                                     <div class="order-button-payment">
 
-                                        <input type="submit" value="Thanh toán" />
+                                        <input type="submit" value="Thanh toán" id="checkout-btn" />
 
                                     </div>
                                     <div class="row">
@@ -211,16 +211,36 @@
                         "CustomerPhone": $("#customer-phone").val(),
                         "CustomerAddress": $("#customer-address").val()
                     };
+                    $("#checkout-btn").attr("disabled", true);
                     $.ajax({
                         type: "POST",
                         url: "@Url.Action("SubmitCheckoutCustomer", "Cart")",
                         data: JSON.stringify(data),
                         dataType: "json",
                         contentType: "application/json",
-                        success: function (response) {
-                            console.log(response);
-                            @*if (response.Success) {
-                                $('#checkout-btn').val("Đặt hàng thành công").css("background", "#00ff7f").css("color", "#000");
+                        success: function (data) {
+                            console.log(data);
+                            if (data.Status) {
+                                swal("Success", `${data.Message}`, "Sucess", {
+                                    buttons: {
+                                        home: "Home",
+                                        profile: {
+                                            text: "Profile",
+                                        }
+                                    },
+                                })
+                                    .then((value) => {
+                                        switch (value) {
+                                            case "home":
+                                                location.href = "@Url.Action("Index", "Home")";
+                                                break;
+
+                                            case "profile":
+                                                location.href = "@Url.Action("Profile", "Customer")";
+                                                break;
+                                        }
+                                    });
+                                @*$('#checkout-btn').val("Đặt hàng thành công").css("background", "#00ff7f").css("color", "#000");
 
                                 $("#timer-text").text("Trở về trang cá nhân sau: ");
                                 $("#timer").text("5")
@@ -231,14 +251,16 @@
                                     } else {
                                         $("#timer").html(eval(timeLeft) - eval(1));
                                     }
-                                }, 1000);
+                                }, 1000);*@
 
                             } else {
-                                $('#checkout-btn').val("Đặt hàng thất bại").css("background", "#f51d1a");
-                            }*@
+                                swal("Fail", `${data.Message}`, "error");
+                                $("#checkout-btn").attr("disabled", false);
+                            }
                         },
                         error: function () {
-                            $('#checkout-btn').val("Đã có lỗi khi đặt hàng").css("background", "#f51d1a");
+                            swal("Fail", `${data.Message}`, "success");
+                            $("#checkout-btn").attr("disabled", false);
                         }
                     });
                 }
