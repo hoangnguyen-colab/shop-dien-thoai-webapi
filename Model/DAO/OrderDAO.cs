@@ -1,4 +1,5 @@
-﻿using Models.EF;
+﻿using Model.EF.CustomModel;
+using Models.EF;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -57,7 +58,8 @@ namespace Models.DAO
                             productid = prod.ProductID,
                             productname = prod.ProductName,
                             productprice = prod.ProductPrice,
-                            discount = prod.PromotionPrice
+                            discount = prod.PromotionPrice,
+                            imageurl = prod.ProductImage
                         };
 
             return query;
@@ -107,6 +109,19 @@ namespace Models.DAO
             {
                 return 0;
             }
+        }
+
+        public async Task<List<Report>> LoadReport()
+        {
+            string sql = @"
+                select ORDERDETAIL.Quantity, PRODUCT.ProductPrice, OrderDate
+                from[ORDER]
+                JOIN ORDERDETAIL ON[ORDER].OrderID = ORDERDETAIL.OrderID
+                JOIN PRODUCT ON ORDERDETAIL.ProductID = PRODUCT.ProductID";
+
+            var query = await new ShopDienThoaiAPI().Database.SqlQuery<Report>(sql).ToListAsync();
+
+            return query;
         }
     }
 }

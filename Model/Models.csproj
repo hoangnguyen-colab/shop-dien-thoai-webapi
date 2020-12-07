@@ -65,6 +65,7 @@
     <Compile Include="EF\BRAND.cs" />
     <Compile Include="EF\CONFIGURATION.cs" />
     <Compile Include="EF\CUSTOMER.cs" />
+    <Compile Include="EF\CustomModel\Report.cs" />
     <Compile Include="EF\ORDER.cs" />
     <Compile Include="EF\ORDERDETAIL.cs" />
     <Compile Include="EF\ORDERSTATU.cs" />

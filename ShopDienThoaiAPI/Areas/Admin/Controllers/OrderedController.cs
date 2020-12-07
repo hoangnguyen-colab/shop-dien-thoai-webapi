@@ -42,6 +42,18 @@ namespace ShopDienThoaiAPI.Areas.Admin.Controllers
             return PartialView("OrderList", list);
         }
 
+        public async Task<ActionResult> OrderDetail(int orderid)
+        {
+            var item = await new OrderDAO().LoadByID(orderid);
+            return View(item);
+        }
+
+        public async Task<JsonResult> OrderProductDetail(int orderid)
+        {
+            var item = await new OrderDAO().LoadProductOrder(orderid);
+            return Json(item, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpPost]
         public async Task<JsonResult> EditOrder(int Orderid, int StatusID)
         {

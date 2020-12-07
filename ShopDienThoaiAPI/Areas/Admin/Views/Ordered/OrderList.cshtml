@@ -14,7 +14,8 @@ else
     {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.OrderID)
+                @*@Html.DisplayFor(modelItem => item.OrderID)*@
+                <a href="@Url.Action("OrderDetail", "Ordered", new { orderid = item.OrderID})">@Html.DisplayFor(modelItem => item.OrderID)</a>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CustomerName)

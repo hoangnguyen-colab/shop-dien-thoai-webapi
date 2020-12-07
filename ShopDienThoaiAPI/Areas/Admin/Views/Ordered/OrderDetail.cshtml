@@ -1,0 +1,100 @@
+﻿@model Models.EF.ORDER
+@{
+    ViewBag.Title = "OrderDetail";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Order Detail</h2>
+
+<br />
+
+<div class="row">
+    <div class="col-md-3">
+        <ul class="list-group">
+            <li class="list-group-item">OrderID</li>
+            <li class="list-group-item">Customer Name</li>
+            <li class="list-group-item">Customer Address</li>
+            <li class="list-group-item">Customer Phone</li>
+            <li class="list-group-item">Created Date</li>
+            <li class="list-group-item">Status</li>
+        </ul>
+    </div>
+    <div class="col-sm">
+        <ul class="list-group">
+            <li class="list-group-item">@Model.OrderID</li>
+            <li class="list-group-item">@Model.CustomerName</li>
+            <li class="list-group-item">@Model.CustomerAddress</li>
+            <li class="list-group-item">@Model.CustomerPhone</li>
+            <li class="list-group-item">@Model.OrderDate</li>
+            <li class="list-group-item">
+                <div class="alert alert-primary" role="alert" id="alert-status">
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<br />
+
+<table class="table table-bordered" id="order-table">
+    <thead>
+        <tr>
+            <th>
+                #
+            </th>
+            <th>
+                Ten Sp
+            </th>
+            <th>
+                Gia
+            </th>
+            <th>
+                So luong
+            </th>
+            <th>Options</th>
+        </tr>
+    </thead>
+    <tbody id="order-partial">
+    </tbody>
+</table>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $.get("@Url.Action("OrderProductDetail", "Ordered")", {
+                "orderid": "@Model.OrderID"
+            }, function (data) {
+                var table = $("#order-partial");
+                for (var i = 0; i < data.length; i++) {
+                    table.append(`<tr><td><img src="${data[i].imageurl}" style="max-height: 50px;" /></td>
+                                    <td>${data[i].productname}</td>
+                                    <td>${data[i].productprice}</td>
+                                    <td>${data[i].Detail.Quantity}</td>
+                                    <td></td></tr>`);
+                }
+            });
+
+            $.get(`https://localhost:44319/api/order/getorderstatus`,
+                {
+                    "orderid": "@Model.OrderID"
+                },
+                function (data) {
+                    var alert = $("#alert-status");
+
+                    if (data.StatusID === 1) {
+                        alert.addClass('alert-secondary');
+                    } else if (data.StatusID === 2) {
+                        alert.addClass('alert-primary');
+                    } else if (data.StatusID === 3) {
+                        alert.addClass('alert-success');
+                    } else if (data.StatusID === 4 || data.StatusID === 5) {
+                        alert.addClass('alert-danger');
+                    };
+
+                    alert.empty().append(data.StatusName);
+
+                }
+            );
+        })
+    </script>
+}
