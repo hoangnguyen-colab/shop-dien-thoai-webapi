@@ -61,7 +61,6 @@
     <script src="~/Areas/Admin/assets/plugins/datatables/responsive.bootstrap4.min.js"></script>
     <script>
         $(document).ready(function () {
-
             $.get("@Url.Action("OrderList", "Ordered")", function (data) {
                 $("#order-partial").append(data);
                 $("#loader").hide();
@@ -99,18 +98,19 @@
                                 "Orderid": id,
                                 "StatusID": $(`#orderstatus-${id}`).val()
                             },
-                            success: function (response) {
-                                if (response.Status) {
+                            success: function (data) {
+                                console.log(data);
+                                if (data.Status) {
                                     swal("Edit success", "", "success")
                                         .then((value) => {
                                             location.reload();
                                         });
                                 } else {
-                                    swal("Edit fail!", `${response.Message}`, "error");
+                                    swal("Edit fail!", data.Message, "error");
                                 }
                             },
                             error: function (error) {
-                                swal("Edit fail!", "", "error");
+                                swal("Edit fail!", "error", "error");
                             }
                         });
                     }

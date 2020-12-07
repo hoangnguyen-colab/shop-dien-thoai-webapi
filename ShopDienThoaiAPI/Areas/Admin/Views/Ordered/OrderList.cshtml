@@ -35,7 +35,7 @@ else
                 @Html.DisplayFor(modelItem => item.CustomerPhone)
             </td>
             <td id="td-status-@item.OrderID" style="font-weight: bold">
-                <select onchange="return ChangeOrder('@item.OrderID', '@item.OrderStatusID')">
+                <select onchange="return ChangeOrder('@item.OrderID', '@item.OrderStatusID')" id="orderstatus-@item.OrderID">
                     @*<option value="@item.OrderStatusID" selected="selected">Status</option>*@
                     @*@foreach (var stat in ViewBag.Status)
                         {
