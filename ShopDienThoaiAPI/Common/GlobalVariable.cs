@@ -14,6 +14,11 @@ namespace ShopDienThoaiAPI.Common
     public class GlobalVariable
     {
         public const string url = "https://localhost:44319/";
+        //public const string url = "http://phonemushroom.somee.com/";
+
+        private const string connectString = "data source=OPEN-AI;initial catalog=SHOPDIENTHOAI;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+        private const string connectStringWeb = "workstation id=shopdienthoai.mssql.somee.com;packet size=4096;user id=hoangcolab1_SQLLogin_1;pwd=4iosfmbfl8;data source=shopdienthoai.mssql.somee.com;persist security info=False;initial catalog=shopdienthoai";
+
         public async Task<string> GetApiAsync(string posturl)
         {
             using (HttpClient httpClient = new HttpClient())

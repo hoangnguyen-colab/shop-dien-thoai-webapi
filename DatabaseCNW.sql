@@ -339,6 +339,52 @@
 -- INSERT [dbo].[CONFIGURATION] ( [OSName], [OSVersion], [SizeDisplay], [FrontCamera], [RearCamera], [Cpu], [Ram], [Rom], [SimStatus], [Battery], [ProductID]) VALUES ( N'Android', N'Andoird 9 Pie', N'6.1" 828 x 1792 Pixels', N'12 MP', N'3 camera 12 MP', N'Snapdragon 855 8 nhân', N'6 GB', N'64 GB', N'2 sim', N'5000 mAh', 26)
 
 
-select ORDERDETAIL.Quantity, PRODUCT.ProductPrice, OrderDate from [ORDER]
+use SHOPDIENTHOAI
+
+SELECT SUM(ORDERDETAIL.Quantity * PRODUCT.ProductPrice) AS Total, CONVERT(VARCHAR(10), OrderDate, 111) AS OrderDate
+FROM [ORDER]
 JOIN  ORDERDETAIL ON [ORDER].OrderID = ORDERDETAIL.OrderID
 JOIN PRODUCT ON ORDERDETAIL.ProductID = PRODUCT.ProductID
+GROUP BY OrderDate
+
+SELECT [ORDER].OrderID, 
+[ORDER].OrderDate, 
+[ORDER].Total, 
+[ORDER].CustomerName, 
+[ORDER].CustomerAddress, 
+[ORDER].CustomerPhone,
+[ORDER].OrderStatusID,
+ORDERSTATUS.StatusName FROM [ORDER]
+JOIN ORDERSTATUS ON [ORDER].OrderStatusID = ORDERSTATUS.StatusID
+WHERE [ORDER].OrderID = 6
+
+SELECT * FROM [ORDER] 
+JOIN ORDERSTATUS ON [ORDER].OrderStatusID = ORDERSTATUS.StatusID
+WHERE [ORDER].OrderID = 9
+
+SELECT PRODUCT.ProductID, PRODUCT.ProductImage, PRODUCT.ProductName, PRODUCT.ProductPrice, ORDERDETAIL.Quantity
+FROM [ORDER] 
+JOIN ORDERDETAIL ON [ORDER].OrderID = ORDERDETAIL.OrderID
+JOIN ORDERSTATUS ON [ORDER].OrderStatusID = ORDERSTATUS.StatusID
+JOIN PRODUCT ON ORDERDETAIL.ProductID = PRODUCT.ProductID
+WHERE ORDERDETAIL.OrderID = 9
+
+SELECT * FROM [ORDER] 
+JOIN ORDERSTATUS ON [ORDER].OrderStatusID = ORDERSTATUS.StatusID
+WHERE [ORDER].CustomerID = 1
+
+select  * from PRODUCT
+order by PRODUCT.CreatedDate desc
+order by PRODUCT.Viewcount desc
+
+UPDATE [ORDER]
+SET OrderStatusID = 3
+WHERE OrderID = 14
+SELECT * FROM [ORDER]
+
+delete from [ORDER]
+where [ORDER].OrderID = 15
+
+select * from CUSTOMER
+
+SELECT TOP(1) OrderID FROM dbo.[ORDER] o ORDER BY o.OrderID DESC

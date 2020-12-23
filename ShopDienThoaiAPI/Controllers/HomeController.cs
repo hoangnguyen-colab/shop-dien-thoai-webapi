@@ -19,6 +19,7 @@ namespace ShopDienThoaiAPI.Controllers
         public ActionResult Index()
         {
             return View();
+            //return Redirect("/admin/home");
         }
 
         [Route("about")]

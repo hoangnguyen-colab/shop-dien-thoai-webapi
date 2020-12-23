@@ -10,6 +10,7 @@ namespace Model.EF.CustomModel
     {
         public int Quantity { get; set; }
         public decimal ProductPrice { get; set; }
-        public DateTime OrderDate { get; set; }
+        public string OrderDate { get; set; }
+        public decimal Total { get; set; }
     }
 }

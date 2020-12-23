@@ -114,10 +114,11 @@ namespace Models.DAO
         public async Task<List<Report>> LoadReport()
         {
             string sql = @"
-                select ORDERDETAIL.Quantity, PRODUCT.ProductPrice, OrderDate
-                from[ORDER]
-                JOIN ORDERDETAIL ON[ORDER].OrderID = ORDERDETAIL.OrderID
-                JOIN PRODUCT ON ORDERDETAIL.ProductID = PRODUCT.ProductID";
+                SELECT sum(ORDERDETAIL.Quantity * PRODUCT.ProductPrice) AS Total, CONVERT(VARCHAR(10), OrderDate, 111) AS OrderDate
+                FROM [ORDER]
+                JOIN  ORDERDETAIL ON [ORDER].OrderID = ORDERDETAIL.OrderID
+                JOIN PRODUCT ON ORDERDETAIL.ProductID = PRODUCT.ProductID
+                GROUP BY OrderDate";
 
             var query = await new ShopDienThoaiAPI().Database.SqlQuery<Report>(sql).ToListAsync();
 

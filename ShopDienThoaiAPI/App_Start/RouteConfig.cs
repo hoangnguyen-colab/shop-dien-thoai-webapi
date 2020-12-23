@@ -21,6 +21,12 @@ namespace ShopDienThoaiAPI
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional },
                 namespaces: new[] { "ShopDienThoaiAPI.Controllers" }
             );
+            //routes.MapRoute(
+            //    name: "Default",
+            //    url: "{controller}/{action}/{id}",
+            //    defaults: new { controller = "Home", action = "Index", Areas = "Admin", id = UrlParameter.Optional },
+            //    namespaces: new[] { "ShopDienThoaiAPI.Controllers" }
+            //);
         }
     }
 }
